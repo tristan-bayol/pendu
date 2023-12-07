@@ -1,4 +1,5 @@
 import pygame
+import sys
 
 pygame.init()
 #Liens vers les tuto :
@@ -135,30 +136,63 @@ def addword ():
     global running
     running = False
 
-    while word :
+    font = pygame.font.Font(None, 40)
+    text_input = pygame.Rect(100, 200, 200, 40)
+    color_inactive = pygame.Color('grey')
+    color_active = pygame.Color('black')
+    color = color_inactive
+    input_text = 'Saisissez le mot de votre choix'
+    active = False
+
+    while word:
         pygame.display.set_caption("Ajout d'un Mot")
         ecran.fill("white")
-        ecran.blit(image_exit2, (450,450))
+        ecran.blit(image_exit2, (450, 450))
 
         if exit_button.afficher():
             word = False
             running = True
 
-
         for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    # Vérifiez si la touche "F4" est enfoncée
-                    if event.key == pygame.K_F4:
-                        # Vérifiez si la touche "Alt" est également enfoncée
-                        if event.mod & pygame.KMOD_ALT:
-                            word = False
-                            running = True
-                    elif event.key == pygame.K_ESCAPE:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if text_input.collidepoint(event.pos):
+                    active = not active
+                else:
+                    active = False
+                color = color_active if active else color_inactive
+
+            if event.type == pygame.KEYDOWN:
+                if active:
+                    if input_text == 'Saisissez le mot de votre choix':
+                        input_text = ''
+                    if event.key == pygame.K_RETURN:
+                        with open("d:/WebDev/Projet/pendu/mots.txt", "a") as mot:
+                            mot.write('\n' + input_text)
+                        input_text = 'Saisissez le mot de votre choix'
+                    elif event.key == pygame.K_BACKSPACE:
+                        input_text = input_text[:-1]
+                    else:
+                        input_text += event.unicode
+
+            if event.type == pygame.KEYDOWN:
+                # Vérifiez si la touche "F4" est enfoncée
+                if event.key == pygame.K_F4:
+                    # Vérifiez si la touche "Alt" est également enfoncée
+                    if event.mod & pygame.KMOD_ALT:
                         word = False
-                        running = True        
-                elif event.type == pygame.QUIT:
-                    pygame.quit()
+                        running = True
+                elif event.key == pygame.K_ESCAPE:
+                    word = False
+                    running = True        
+            elif event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
         
+        txt_surface = font.render(input_text, True, color)
+        width = max(600, txt_surface.get_width()+10)
+        text_input.w = width
+        ecran.blit(txt_surface, (text_input.x+5, text_input.y+5))
+        pygame.draw.rect(ecran, color, text_input, 4)
         pygame.display.flip()
 
 main_menu ()
