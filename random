@@ -1,0 +1,13 @@
+import random
+
+liste = []
+
+with open("d:/WebDev/Projet/pendu/mots.txt", "r") as mot:
+    for x in mot:
+        liste.append(x)
+
+random_word = random.choice(liste)
+print (random_word)
+
+for x in random_word:
+    print("_", end="")
